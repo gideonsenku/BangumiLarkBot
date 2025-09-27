@@ -155,22 +155,14 @@ def push():
     from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
     logging.info(f"[I] push: 收到推送请求 {request.full_path}")
     video_id = request.values.get("vid")
-    subject_id = None
-    if video_id:
-        s = Session()
-        s.mount("https://", HTTPAdapter(max_retries=3))
-        r = s.post("https://api.bangumi.online/bgm/subject", data={"vid": video_id}, timeout=10).json()
-        if r["code"] == 10000:
-            subject_id = r["data"]["season"]["id"]
-            subject_info = r["data"]["season"]["title"]["zh"] or r["data"]["season"]["title"]["ja"]
-            volume = r["data"]["episode"]["volume"]
-        else:
-            return jsonify({"code": 500, "message": "获取视频信息失败"}), 500
+    subject_id = request.values.get("subject_id")
+    subject_name = request.values.get("title")
+    volume = request.values.get("volume")
     if subject_id and video_id:
         subscribe_list = sql.inquiry_subscribe_data(subject_id)
         if subscribe_list:
             text = (
-                f"*🌸 #{subject_info} [*[{volume}](https://cover.bangumi.online/episode/{video_id}.png)*] 更新咯～*\n\n"
+                f"*🌸 #{subject_name} [*[{volume}](https://cover.bangumi.online/episode/{video_id}.png)*] 更新咯～*\n\n"
                 f"[>>🍿 前往观看](https://bangumi.online/watch/{video_id}?s=bgmbot)\n"
             )
             markup = InlineKeyboardMarkup()
