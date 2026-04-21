@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtualenvs
+.venv/
+venv/
+env/
+
+# Secrets & runtime state (mounted via volume / injected at runtime)
+.env
+data/*.db
+data/*.log
+data/run.out
+
+# VCS & editor
+.git/
+.gitignore
+.idea/
+.vscode/
+.DS_Store
+
+# Build artifacts / dev noise
+docker/
+*.md
+.github/

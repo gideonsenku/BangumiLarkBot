@@ -1,22 +1,19 @@
-FROM python:3.9-slim-bullseye
+FROM python:3.11-slim
 
-RUN apt-get update -yq && \
-    apt-get install -yq curl
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
 
-COPY Pipfile /app/Pipfile
-COPY Pipfile.lock /app/Pipfile.lock
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install pipenv
-RUN pipenv install --deploy
+COPY . .
 
-COPY apiserver /app/apiserver
-COPY data /app/data
-COPY tgbot /app/tgbot
-COPY utils /app/utils
-COPY main.py /app/main.py
+EXPOSE 6008
 
-VOLUME ["/app/data/config.yaml", "/app/data"]
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD python -c "import urllib.request,sys; urllib.request.urlopen('http://localhost:6008/health', timeout=3).read()" || exit 1
 
-CMD pipenv run
+CMD ["python", "main.py"]

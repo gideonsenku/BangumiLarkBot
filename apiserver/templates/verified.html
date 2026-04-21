@@ -1,13 +1,21 @@
 <!doctype html>
 <html lang="zh">
-    <head>
-        <script src="https://telegram.org/js/telegram-web-app.js"></script>
-        <script>
-            alert("你已验证成功，无需重复验证");
-            Telegram.WebApp.close()
-        </script>
-    </head>
+<head>
+  <meta charset="utf-8">
+  <title>绑定成功</title>
+  <style>
+    body { font-family: -apple-system, Segoe UI, sans-serif; display: flex;
+           align-items: center; justify-content: center; height: 100vh;
+           margin: 0; background: #f5f7fa; }
+    .card { background: white; padding: 40px 60px; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; }
+    h1 { color: #00a854; margin: 0 0 12px; }
+  </style>
+</head>
 <body>
-<p><a>你已验证成功，无需重复验证</a></p>
+  <div class="card">
+    <h1>✅ 绑定成功</h1>
+    <p>你可以关闭此页面，返回飞书继续使用 Bot。</p>
+  </div>
 </body>
 </html>

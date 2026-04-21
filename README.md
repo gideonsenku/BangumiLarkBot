@@ -1,116 +1,144 @@
-<img src="https://avatars.githubusercontent.com/u/7521082?s=200&v=4" align="left" width="65"> <h1>Bangumi Telegram Bot</h1>
+# Bangumi Feishu Bot
+
+一个运行在飞书 / Lark 的 Bangumi 机器人，用于查询和管理你的番剧 / 书籍 / 游戏 / 音乐 / 剧集收藏。参考并移植自 [BangumiTelegramBot](https://github.com/bilahner/BangumiTelegramBot)。
 
 ## 功能
 
-- [x] Web 登录
-- [x] OAuth授权
-  - [x] 授权登录
-  - [x] 授权有效期刷新
-- [x] 查询个人收藏统计
-- [x] 收视进度更新
-- [x] 在看评分
-- [x] 通过 Telegram Inline 功能进行条目搜索
-- [x] 管理收藏
-- [x] 每日放送查询
-- [x] 图片搜索条目
-- [x] 章节评论发送
-- [x] 圣地巡礼数据查询 数据来自 [Anitabi.cn](https://anitabi.cn/)
-- [x] 与 [Bangumi.online](https://bangumi.online/) 联动的番剧更新提醒
+- 飞书自建应用 **WebSocket 长连**接入，无需公网 HTTPS 即可本地开发
+- Bangumi OAuth 绑定 / 解绑
+- 收藏查询（`/anime` `/book` `/game` `/music` `/real`）：编号翻页 → 点编号进入条目详情 → `简介 / 关联 / 点格子 / 返回 / 收藏管理`
+- 条目搜索 `/search <关键字>`
+- 每日放送 `/week [1-7]`
+- 自动展开消息中的 Bangumi 条目链接
+- 卡片内直接更新进度 / 评分 / 收藏状态
+- OAuth 回调 + Redis 会话 + 事件幂等去重
 
-......
-
-## 功能展示
-
-  | 功能 | 展示 | 功能 | 展示 | 功能 | 展示 |
-  | :---: | :---: | :---: | :---: | :---: | :---: |
-  | 登录授权 | ![登录授权](https://user-images.githubusercontent.com/60847880/221489586-7d630b50-fd4f-412a-80bd-6176fb9df62a.gif) | Oauth 授权 | ![Oauth 授权](https://user-images.githubusercontent.com/60847880/221490098-34d0e993-cccf-420a-ae90-6a89980cc530.gif) | 收藏列表 | ![收藏列表](https://user-images.githubusercontent.com/60847880/221491257-799efdc8-fb46-4052-9873-c90ba9293d44.gif)
-  | 条目展示 | ![条目展示](https://user-images.githubusercontent.com/60847880/221491539-8854c89c-dcbd-4feb-9c48-22061f2fcab5.gif) | 章节展示 |![章节展示](https://user-images.githubusercontent.com/60847880/221491762-5f3c37c7-1c6e-4234-b7d2-d60d86cead5d.gif) | 每日放送 | ![每日放送](https://user-images.githubusercontent.com/60847880/221492430-bbc4f15d-1d81-4306-b5f3-8f3499310065.gif)!
-  | 条目搜索 (Bot 内) |  ![条目搜索-Bot内](https://user-images.githubusercontent.com/60847880/221493670-cf1dfc97-c945-4a45-9e2f-e867ed47acad.gif) | 条目搜索 (Bot 外) | ![条目搜索-Bot外](https://user-images.githubusercontent.com/60847880/221495161-85fa2249-f9ab-449d-85bb-7cf5cae6435c.gif) | 条目搜索(在有Bot群组) | ![条目搜索-在有Bot群组](https://user-images.githubusercontent.com/60847880/221494280-e091da80-40f6-4372-8d48-88ff5f47fc63.gif)
-  | 角色搜索 |![虚拟人物搜索](https://user-images.githubusercontent.com/60847880/221498599-3365918f-a5d1-4483-93ef-4eca1ca3bfdb.gif) | 巡礼地图 | ![巡礼地图](https://user-images.githubusercontent.com/60847880/221502756-32ac0770-d95a-4a11-800d-2c7f2b17be16.gif) | 图片搜索条目 | ![图片搜索条目](https://user-images.githubusercontent.com/60847880/221498889-85102ed1-58e9-4b95-a703-f6e44353ef17.gif)
-  
-> 更多搜索方法见下
-
-## inline 内联搜索使用方法
-
-![inline内联搜索方法](https://user-images.githubusercontent.com/60847880/221499459-862a2e71-6f87-4860-9642-e666c5657ccb.png)
-
-## 安装
-
-- 安装 [Redis](https://redis.io/)
-
-  您可以参考 [Redis 安装教程](https://www.google.com/search?q=Redis%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)
-
-- 安装 [Pipenv](https://pipenv.pypa.io/)  `可选｜Optional`
-
-  您可以参考 [Pipenv 安装教程](https://pipenv.pypa.io/en/latest/#install-pipenv-today)
-
-- 修改文件后缀 `data/config.example.yaml` 为 `data/config.yaml`
-
-  根据文件内提示修改 `config.yaml` 配置文件
-
-  > 如需使用 Web 绑定功能需配置反代 `WEBSITE_BASE` 必须为 HTTPS `可选｜Optional`
-
-- 安装依赖
-  > **Warning** 需要 Python >= 3.9
-  ```
-  pip3 install -r requirements.txt
-  ```
-
-  如使用 Pipenv `可选｜Optional`
-  ```
-  pipenv install --dev
-  ```
-
-- 运行
-  
-  ```
-  python3 main.py
-  ```
-
-  如使用 Pipenv `可选｜Optional`
-  ```
-  pipenv run python3 main.py
-  ```
-
-  - 如遇绑定链接无法访问请检查服务器防火墙
-
-- 通过 [@BotFather](https://t.me/botfather) 将 Inline 功能开启
-
-  `/mybots` -> `选择 bot` -> `Bot Settings` -> `Inline Mode` -> 按下 `Turn on` (画面显示 Inline mode is currently enabled for xxxx 就表示启用了)
-
-- 如使用 Pipenv 格式化代码 (可选｜Optional)
-
-  ```
-  pipenv run black .
-  ```
-
-## 如使用 Docker Compose 运行
-
-- 安装 [Docker Compose](https://docs.docker.com/compose/)
-
-  您可以参考 [Docker Compose 安装教程](https://docs.docker.com/compose/install/)
-
-- 修改文件后缀 `config.example.yaml` 为 `config.yaml`
-
-  根据文件内提示修改 `config.yaml` 配置文件，并放置到 `/data/config.yaml`
-
-  `REDIS_HOST` 请设置为 `redis`
-
-- 使用 Docker Compose 运行
-
-  `cd docker && docker compose up -d`
-
-## 命令列表
+## 交互流程（`/anime` 等收藏指令）
 
 ```
-start - 绑定Bangumi账号
-help - 使用帮助
-book - Bangumi用户在读书籍
-anime - Bangumi用户在看动画
-game - Bangumi用户在玩游戏
-real - Bangumi用户在看剧集
-week - 查询当日/空格加数字查询每日放送
-search - 搜索条目
-isearch - 图片搜索
-close - 关闭此对话
+列表（编号 + 翻页）
+   │
+   ▼ 点击 ① ~ ⑤
+条目详情（简介 | 关联 | 点格子 | 返回 | 收藏管理）
+   ├── 简介     → 完整 summary
+   ├── 关联     → 分组列出，点编号下钻到子条目详情
+   ├── 点格子   → 章节网格，点编号切换"看过/撤销"
+   └── 收藏管理 → 状态 / 评分 / 进度按钮
 ```
+
+返回按钮会回到上一层；从关联下钻的子条目返回到关联页，再往上回到列表。
+
+## 飞书应用配置
+
+1. 打开 [飞书开放平台](https://open.feishu.cn/app)，创建「自建应用」。
+2. 记录 **App ID** 和 **App Secret**。
+3. 在「添加应用能力」启用「机器人」。
+4. 「事件与回调」→「事件配置」选择 **「使用长连接接收事件」**。
+5. 订阅事件：
+   - `im.message.receive_v1` — 接收消息
+   - `card.action.trigger` — 卡片按钮回调
+6. 权限（最小集）：
+   - `im:message`、`im:message:send_as_bot`
+   - `im:resource`（图片下载）
+7. 发布应用到组织 / 企业。
+
+## 配置
+
+复制模板：
+
+```bash
+cp .env.example .env
+```
+
+关键环境变量：
+
+| 变量 | 说明 |
+|------|------|
+| `FEISHU_APP_ID` / `FEISHU_APP_SECRET` | 飞书自建应用凭据 |
+| `FEISHU_TRANSPORT` | `websocket`（默认，推荐）或 `webhook` |
+| `FEISHU_BOT_OPEN_ID` | 可选，填入后群聊可精准检测 @机器人 |
+| `BGM_APP_ID` / `BGM_APP_SECRET` | Bangumi 应用凭据（用于 OAuth） |
+| `BGM_ACCESS_TOKEN` | 可选；未绑定场景下调用 API 使用 |
+| `API_PORT` | 本地 Flask 端口（默认 6008） |
+| `API_WEBSITE_BASE` | Bangumi OAuth 回调必须可达；**生产必须是 HTTPS 公网地址** |
+| `API_AUTH_KEY` | `/push` 推送接口鉴权头 |
+| `REDIS_HOST` / `REDIS_PORT` / `REDIS_DB` | Redis 连接配置 |
+| `LOG_LEVEL` | `DEBUG` / `INFO` / `WARNING` / `ERROR` |
+
+> `.env` 已在 `.gitignore` 中，**不要提交到仓库**。容器环境可直接通过 `env_file` 或平台级变量注入，不一定需要物理 `.env`。
+
+## 本地运行
+
+需要 Python ≥ 3.10 和 Redis。
+
+```bash
+cp .env.example .env
+# 编辑 .env 填入 FEISHU / BGM / API 的密钥
+
+pip install -r requirements.txt
+python main.py
+```
+
+私聊 bot 发送 `/help` 查看指令，或 `/start` 开始绑定。
+
+## Docker Compose 运行
+
+```bash
+cp .env.example .env
+# 编辑 .env 填入真实密钥。compose 会自动把 REDIS_HOST 覆写成 redis。
+
+cd docker && docker compose up -d --build
+docker compose logs -f bot
+```
+
+`docker/` 下的 compose 会把仓库根目录的 `data/` 挂载进容器（`../data:/app/data`），`bot.db` 和 `run.log` 留在宿主机；`.env` 通过 `env_file: ../.env` 注入。镜像内置了 `/health` 的 healthcheck。
+
+## 指令列表
+
+| 指令 | 说明 |
+|------|------|
+| `/start` | 绑定 Bangumi 账号 |
+| `/unbind` | 解除绑定 |
+| `/help` | 帮助 |
+| `/anime` | 在看动画 |
+| `/book` | 在读书籍 |
+| `/game` | 在玩游戏 |
+| `/music` | 在听音乐 |
+| `/real` | 在看剧集 |
+| `/search <关键字>` | 搜索条目 |
+| `/week [1-7]` | 每日放送（空 = 今日） |
+| `/info <id>` | 查看条目详情 |
+
+## 架构
+
+```
+BangumiFeishuBot/
+├── main.py                   # 启动入口
+├── apiserver/                # Flask + waitress：OAuth 回调 / health / push
+├── feishubot/
+│   ├── bot.py                # lark.ws.Client 长连
+│   ├── dispatcher.py         # 消息 / 卡片事件路由 + 幂等去重
+│   ├── handlers/             # 每个指令 / 动作一个 handler
+│   └── cards/                # 交互卡片 JSON 构造器
+├── utils/                    # config / sqlite / bgm_api / user_token / feishu_client
+├── data/                     # bot.db / run.log（运行期生成，不入库）
+├── .env                      # 环境变量（不入库；参考 .env.example）
+└── docker/                   # Dockerfile + docker-compose
+```
+
+## 贡献
+
+Issue / PR 欢迎。提交前请确保：
+
+- 不要把 `.env`、`data/*.db`、`data/*.log` 加入 commit
+- 新交互请同步更新 README 的「交互流程」与「指令列表」
+
+## 致谢
+
+- [BangumiTelegramBot](https://github.com/bilahner/BangumiTelegramBot) — 原始实现与交互范式
+- [Bangumi API](https://bangumi.github.io/api/) — 数据源
+- [lark-oapi-python](https://github.com/larksuite/oapi-sdk-python) — 飞书 SDK
+
+## License
+
+[MIT](./LICENSE)

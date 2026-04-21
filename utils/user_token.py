@@ -1,29 +1,43 @@
-import datetime
-from typing import Union
+import logging
+import time
 
-from .config_vars import bgm, sql
-from tgbot.model.exception import TokenExpired
+from .bgm_api import BgmApi
 
-async def bgm_user_data(tg_id: int) -> Union[dict, None]:
-    """获取用户的数据 过期则刷新 没有则返回 None
-    :return: {"tgID": 用户 ID, "bgmId": 用户 ID, "accessToken": 授权密钥, "Cookie": Cookie, "userData": 用户数据}"""
-    user_key = sql.inquiry_user_data(tg_id)
-    if user_key:
-        user_data = await bgm.get_user_info(user_key[1])
-        if user_key[5] < datetime.datetime.now().timestamp() // 1000:
-            back = await bgm.oauth_refresh_token(user_key[3])
-            if not back.get("access_token"):
-                if not user_key[4]:
-                    sql.delete_user_data(tg_id)
-                    raise TokenExpired("Token 已过期")
-                code = bgm.web_authorization_oauth(user_key[4])
-                if not code:
-                    sql.delete_user_data(tg_id)
-                    raise TokenExpired("Token 已过期")
-                back = bgm.oauth_authorization_code(code)
-            sql.update_user_data(tg_id, back["access_token"], back["refresh_token"], user_key[4])
-            return {"tgID": user_key[0], "bgmId": user_key[1], "accessToken": back["access_token"], "Cookie": user_key[4], "userData": user_data}
-        else:
-            return {"tgID": user_key[0], "bgmId": user_key[1], "accessToken": user_key[2], "Cookie": user_key[4], "userData": user_data}
-    else:
+logger = logging.getLogger(__name__)
+
+# token 剩余有效期少于此阈值（秒）即主动刷新
+_REFRESH_THRESHOLD = 7 * 24 * 3600
+
+
+class TokenExpired(Exception):
+    """Token 刷新失败（区别于用户未绑定）。"""
+
+
+def get_valid_token(open_id: str, sql, bgm: BgmApi) -> dict | None:
+    """根据 open_id 返回 {access_token, bgm_user_id}，必要时自动刷新。
+
+    - 未绑定：返回 None
+    - 刷新失败：抛 TokenExpired（handler 应提示用户重新 /start）
+    """
+    user = sql.inquiry_user_data(open_id)
+    if not user:
         return None
+
+    if user["token_expires"] and user["token_expires"] - int(time.time()) < _REFRESH_THRESHOLD:
+        try:
+            new_token = bgm.oauth_refresh_token(user["refresh_token"])
+            sql.update_user_token(
+                open_id=open_id,
+                access_token=new_token["access_token"],
+                refresh_token=new_token["refresh_token"],
+                token_expires=int(time.time()) + int(new_token.get("expires_in", 0)),
+            )
+            user["access_token"] = new_token["access_token"]
+        except Exception as e:
+            logger.warning("refresh token failed for %s: %s", open_id, e)
+            raise TokenExpired(str(e)) from e
+
+    return {
+        "access_token": user["access_token"],
+        "bgm_user_id": user["bgm_user_id"],
+    }

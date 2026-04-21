@@ -1,5 +1,12 @@
-run.log
-*.db
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+data/*.db
+data/*.log
+data/run.out
 .DS_Store
-__pycache__
-config.yaml
+.idea/
+.vscode/
